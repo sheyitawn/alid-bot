@@ -1,0 +1,10 @@
+.play {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.play .dot {
+    font-size: 2em;
+}
