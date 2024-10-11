@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import newRequest from '../../utils/newRequest';
+import { toast } from 'react-toastify';
 import './teach.css'
 
 const Teach = () => {
@@ -9,10 +11,25 @@ const Teach = () => {
   const [arm1, setArm1] = useState(0);
   const [arm2, setArm2] = useState(0);
 
-  const [base, setBase] = useState(0);
+  const [base, setBase] = useState(1700); // 1700
 
   const [grip, setGrip] = useState(0);
 
+  const handleBaseChange = async (event) => {
+    const newPos = event.target.value;
+    const currServo = 0;   // base servo is 0
+    setBase(newPos)
+
+    try {
+      const response = await newRequest.post('/control', {
+        servo: currServo,
+        position: newPos,
+      });
+      toast.success(`Servo ${currServo} moved to position ${newPos}`);
+    } catch (error) {
+      console.error('Error moving servo:', error);
+    }
+  };
 
   return (
     <div className='teach'>
@@ -62,10 +79,10 @@ const Teach = () => {
 
           <input
             type="range"
-            min="0"
-            max="360"
+            min="500"
+            max="2500"
             value={base}
-            onChange={(e) => setBase(e.target.value)}
+            onChange={handleBaseChange}
           />
           <p>{base}°</p>
 
@@ -84,7 +101,7 @@ const Teach = () => {
         </div>
         
       </div>
-      {/* <button>teach</button> */}
+      {/* <button onClick={handleServoChange}>teach</button> */}
 
 
     </div>
