@@ -10,8 +10,20 @@ ESP8266WebServer server(80);
 SoftwareSerial sscSerial(5, 4);
 
 
+void handleCors() {   // handle cors error
+  Serial.println("handling cors");
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.sendHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+  server.sendHeader("Access-Control-Allow-Headers", "Content-Type");
+  server.send(204, "text/plain", "handled cors");
+}
+
+
 void handleServoControl() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  
   if (server.hasArg("plain")) {
+
     String body = server.arg("plain");
 
     DynamicJsonDocument doc(1024);
@@ -38,8 +50,10 @@ void handleServoControl() {
   }
 }
 
+
 void setup() {
   Serial.begin(115200);
+
   WiFi.begin(ssid, password);
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
@@ -56,7 +70,10 @@ void setup() {
   sscSerial.begin(115200);    // start serial communication
 
   // routes
-  server.on("/control", handleServoControl); 
+  server.on("/control", HTTP_OPTIONS, handleCors);     // cors
+  server.on("/control", HTTP_POST, handleServoControl); 
+
+  
   server.begin();
 }
 
