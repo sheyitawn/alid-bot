@@ -2,3 +2,36 @@ body {
   background-color: rgb(6, 7, 12);
   color: white;
 }
+
+a:visited {
+  text-decoration: none;
+  color: white;
+}
+
+
+.header {
+  margin: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header p {
+  font-size: .9em;
+  color: rgb(76, 76, 76);
+}
+
+.header p:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.header .back_button{
+  font-size: 1.4em;
+}
+
+
+.header .back_button:hover{
+  cursor: pointer;
+  color: rgb(76, 76, 76);
+}
