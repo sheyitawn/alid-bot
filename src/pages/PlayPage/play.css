@@ -1,10 +1,11 @@
-.play {
-    height: 100vh;
+
+.play_player {
+    height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.play .dot {
+.play_player .dot {
     font-size: 2em;
 }

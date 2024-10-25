@@ -1,10 +1,11 @@
 .teach {
     /* height: 80vh; */
     overflow: hidden;
-
-
-
+    display: flex;
+    flex-direction: column;
 }
+
+
 
 .teach h1{
     text-align: center;
@@ -32,11 +33,18 @@
     justify-content: space-around;
 }
 
-.teach button{
+.teach-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.teach .teach-buttons button{
     margin: .5rem;
     width: 10rem;
     padding: .8rem;
-    font-size: 1.2em;
+    font-size: 1em;
     font-weight: 700;
     cursor: pointer;
     background-color: #3700ff;
@@ -49,6 +57,6 @@
 
 }
 
-.teach button:hover {
+.teach .teach-buttons button:hover {
     background-color: #1b0666;
 }
