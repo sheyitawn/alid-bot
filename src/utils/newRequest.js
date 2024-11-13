@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const baseURL =  'http://192.168.1.251';
+const baseURL =  'http://172.20.10.14';
 
 const newRequest = axios.create({
   baseURL,

@@ -3,8 +3,15 @@
 #include <SoftwareSerial.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "BT-98CJJX";     // wifi SSID
-const char* password = "XGRpnapxnkE6Pk";    // password
+// const char* ssid = "BT-98CJJX";     // wifi SSID
+// const char* password = "XGRpnapxnkE6Pk";    // password
+
+// const char* ssid = "haha";     // wifi SSID
+// const char* password = "1t55hw1fty";    // password
+
+const char* ssid = "Grandpa Garp";     // wifi SSID
+const char* password = "Orange12";    // password
+
 
 ESP8266WebServer server(80);
 SoftwareSerial sscSerial(5, 4);
@@ -40,7 +47,9 @@ void handleServoControl() {
     int position = doc["position"];
 
     // create SSC-32U command and send
-    String command = "#" + String(servo) + "P" + String(position) + "T1000\r";
+    String command = "#" + String(servo) + " P" + String(position) + " T1000\r";
+    // Serial.println("#0 P1600 T500");
+    Serial.println(command);
     sscSerial.print(command);
 
     Serial.println("COMMAND SENT: " + command);

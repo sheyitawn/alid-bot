@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import newRequest from '../../utils/newRequest';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,55 +8,23 @@ import { Link } from "react-router-dom";
 import './teach.css'
 
 const Teach = () => {
-
-
+  const [ws, setWs] = useState(null);
 
   const [arm0, setArm0] = useState(0);
   const [arm1, setArm1] = useState(0);
   const [arm2, setArm2] = useState(0);
 
-  const [base, setBase] = useState(1700); // 1700
+  const [base, setBase] = useState(0);
 
   const [grip, setGrip] = useState(0);
 
 
   const [sequence, setSequence] = useState([]);
+  // var sequence = JSON.parse(localStorage.getItem("sequence"))
 
-
-  const handleBaseChange = async (event) => {
-    const newPos = parseInt(event.target.value);
-    const currServo = 0;   // base servo is 0
-    setBase(newPos)
-
-    try {
-      const response = await newRequest.post('/control', {
-        servo: currServo,
-        position: newPos,
-      });
-      toast.success(`Servo ${currServo} moved to position ${newPos}`);
-    } catch (error) {
-      console.error('Error moving servo:', error);
-    }
-  };
-
-  const handleGripChange = async (event) => {
-    const newPos = parseInt(event.target.value);
-    const currServo = 0;   // base servo is 0
-    setGrip(newPos)
-
-    try {
-      const response = await newRequest.post('/control', {
-        servo: currServo,
-        position: newPos,
-      });
-      toast.success(`Servo ${currServo} moved to position ${newPos}`);
-    } catch (error) {
-      console.error('Error moving servo:', error);
-    }
-  };
 
   const addToSequence = () => {
-    const newSequence = [arm0, arm1, arm2, base, grip]
+    const newSequence = [arm0, base]
     console.log("🚀 ~ addToSequence ~ newSequence:", newSequence)
     setSequence((prev) => [...prev, ...[newSequence]]);
     toast.success('adding to sequence');
@@ -64,7 +32,10 @@ const Teach = () => {
 
   const playSequence = () => {
     console.log("🚀 ~ sequence:", sequence)
-    toast.success(`playing sequence`);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId: 99, sequence })); // command to play the sequence
+      toast.success(`playing sequence`);
+    }
   }
 
   const saveSequence = () => {
@@ -77,6 +48,52 @@ const Teach = () => {
     console.log("🚀 ~ sequence:", sequence)
     toast.success(`resetting...`);
   }
+
+  const handleBaseChange = async (value, servoId) => {
+    const newPos = parseInt(value, 10);
+    setBase(newPos);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: newPos }));
+    }  else {
+      toast.error('Unable to send base position')
+    }
+  };
+
+  const handleArm0Change = async (value, servoId) => {
+    const newPos = parseInt(value, 10);
+    setArm0(newPos);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: newPos }));
+    }  else {
+      toast.error('Unable to send arm 0 position')
+    }
+  };
+
+  const handleArm1Change = async (value, servoId) => {
+    const newPos = parseInt(value, 10);
+    setArm1(newPos);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: newPos }));
+    }  else {
+      toast.error('Unable to send arm 1 position')
+    }
+  };
+
+  useEffect(() => {
+    const webSocket = new WebSocket("ws://localhost:8080");
+    setWs(webSocket);
+
+    return () => {
+      if (webSocket) {
+        webSocket.close();
+      }
+    };
+  }, []);
+
+  
 
   return (
     <div className='teach'>
@@ -97,9 +114,9 @@ const Teach = () => {
             <input
               type="range"
               min="0"
-              max="360"
+              max="180"
               value={arm0}
-              onChange={(e) => setArm0(parseInt(e.target.value))}
+              onChange={(e) => handleArm0Change(e.target.value, 0)}
             />
             <p>{arm0}°</p>
           </div>
@@ -109,9 +126,9 @@ const Teach = () => {
             <input
               type="range"
               min="0"
-              max="360"
+              max="180"
               value={arm1}
-              onChange={(e) => setArm1(parseInt(e.target.value))}
+              onChange={(e) => handleArm1Change(e.target.value, 0)}
             />
             <p>{arm1}°</p>
           </div>          
@@ -122,7 +139,7 @@ const Teach = () => {
             <input
               type="range"
               min="0"
-              max="360"
+              max="180"
               value={arm2}
               onChange={(e) => setArm2(parseInt(e.target.value))}
             />
@@ -135,15 +152,15 @@ const Teach = () => {
 
           <input
             type="range"
-            min="500"
-            max="2500"
+            min="0"
+            max="180"
             value={base}
-            onChange={handleBaseChange}
+            onChange={(e) => handleBaseChange(e.target.value, 3)}
           />
           <p>{base}°</p>
 
         </div>
-        <div className="teach-grip">
+        {/* <div className="teach-grip">
           <h3>Grip</h3>
 
           <input
@@ -154,7 +171,7 @@ const Teach = () => {
             onChange={handleGripChange}
           />
           <p>{grip}°</p>
-        </div>
+        </div> */}
         
       </div>
       <div className='teach-buttons'>
