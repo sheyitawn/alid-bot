@@ -63,9 +63,13 @@ const Teach = () => {
   const handleArm0Change = async (value, servoId) => {
     const newPos = parseInt(value, 10);
     setArm0(newPos);
+    console.log("🚀 ~ handleArm0Change ~ newPos:", newPos)
+
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ servoId, value: newPos }));
+      console.log("sending state")
+
     }  else {
       toast.error('Unable to send arm 0 position')
     }
@@ -91,6 +95,13 @@ const Teach = () => {
         webSocket.close();
       }
     };
+
+
+    // return () => {
+    //   if (webSocket.readyState === 1) { // <-- This is important
+    //     webSocket.close();
+    //   }
+    // }
   }, []);
 
   
@@ -160,7 +171,7 @@ const Teach = () => {
           <p>{base}°</p>
 
         </div>
-        {/* <div className="teach-grip">
+        <div className="teach-grip">
           <h3>Grip</h3>
 
           <input
@@ -168,10 +179,9 @@ const Teach = () => {
             min="500"
             max="2500"
             value={grip}
-            onChange={handleGripChange}
           />
           <p>{grip}°</p>
-        </div> */}
+        </div>
         
       </div>
       <div className='teach-buttons'>

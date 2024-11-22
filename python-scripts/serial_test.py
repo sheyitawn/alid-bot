@@ -2,7 +2,7 @@ import serial
 import time
 
 # open serial connection
-ssc32 = serial.Serial('COM5', 115200, timeout=1)
+ssc32 = serial.Serial('COM11', 115200, timeout=1)
 
 # set servo 0 to 600 then 1600 microseconds over 1 second
 ssc32.write(b'#3P700T1000\r') # start
