@@ -18,13 +18,15 @@ const Teach = () => {
 
   const [grip, setGrip] = useState(0);
 
+  const [IRValue, setIRValue] = useState(null);
+
 
   const [sequence, setSequence] = useState([]);
   // var sequence = JSON.parse(localStorage.getItem("sequence"))
 
 
   const addToSequence = () => {
-    const newSequence = [arm0, base]
+    const newSequence = [base, arm0, arm1]
     console.log("🚀 ~ addToSequence ~ newSequence:", newSequence)
     setSequence((prev) => [...prev, ...[newSequence]]);
     toast.success('adding to sequence');
@@ -87,8 +89,13 @@ const Teach = () => {
   };
 
   useEffect(() => {
-    const webSocket = new WebSocket("ws://localhost:8080");
+    const webSocket = new WebSocket("ws://localhost:3003");
     setWs(webSocket);
+
+    webSocket.onmessage = (event) => {
+      setIRValue(event.data);
+
+    };
 
     return () => {
       if (webSocket) {
@@ -127,7 +134,7 @@ const Teach = () => {
               min="0"
               max="180"
               value={arm0}
-              onChange={(e) => handleArm0Change(e.target.value, 0)}
+              onChange={(e) => handleArm0Change(e.target.value, 1)}
             />
             <p>{arm0}°</p>
           </div>
@@ -139,7 +146,7 @@ const Teach = () => {
               min="0"
               max="180"
               value={arm1}
-              onChange={(e) => handleArm1Change(e.target.value, 0)}
+              onChange={(e) => handleArm1Change(e.target.value, 2)}
             />
             <p>{arm1}°</p>
           </div>          
@@ -166,7 +173,7 @@ const Teach = () => {
             min="0"
             max="180"
             value={base}
-            onChange={(e) => handleBaseChange(e.target.value, 3)}
+            onChange={(e) => handleBaseChange(e.target.value, 0)}
           />
           <p>{base}°</p>
 
@@ -189,8 +196,16 @@ const Teach = () => {
         <button onClick={playSequence}>play sequence</button>
         <button onClick={saveSequence}>save</button>
         <button onClick={resetSequence}>reset</button>
-      </div>
+        <>
+          BALL INDICATOR
 
+          <div
+            className="teach-buttons_indicator"
+            style={{background: IRValue === '1' ? 'rgb(30, 255, 0)' : 'rgb(78, 0, 0)'}}>
+            {/* {IRValue} */}
+          </div>
+        </>
+      </div>
 
     </div>
   )
