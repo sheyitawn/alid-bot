@@ -1,27 +1,36 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 
-Servo arm0, base;
+Servo arm0, arm1, base;
 
 const int greenLED = 6;
 const int redLED = 5;
 
-const int numServos = 2;           // Number of servos
+int IRSensor = A5;
+
+const int numServos = 3;           // Number of servos
 
 void setup() {
-  arm0.attach(A3);
-  base.attach(A5);
+  base.attach(A0); // change to A5 for bot
+  arm0.attach(A1); // change to A3 for bot
+  arm1.attach(A2);
+
   
   pinMode(greenLED, OUTPUT);
   pinMode(redLED, OUTPUT);
-  Serial.begin(9600);
 
-  Serial.println("ALID-BOT READY!💫");
-  arm0.write(0);
+  pinMode(IRSensor, INPUT); // IR Sensor pin INPUT
+  // pinMode(LED_BUILTIN, OUTPUT);
+
   base.write(0);
+  arm0.write(0);
+  arm1.write(0);
+  Serial.begin(9600);
+  Serial.println("ALID-BOT READY!💫");
+
+
 }
 
-// Function to play the received sequence
 void playSequence(JsonArray sequence) {
 
   for (int i = 0; i < 3; i++) {
@@ -32,45 +41,55 @@ void playSequence(JsonArray sequence) {
   }
 
   for (JsonArray step : sequence) {
-    // Assuming the sequence array includes positions for arm0 and base
-    int arm0Pos = step[0];
-    int basePos = step[1];
+    // final -> [base, arm0, arm1, arm2, arm3, grip]
+    // [base, arm0, arm1]
+    int basePos = step[0];
+    int arm0Pos = step[1];
+    int arm1Pos = step[2];
 
-    // Move servos to their respective positions for this step
-    arm0.write(arm0Pos);
+
+    // move servos to their respective positions
     base.write(basePos);
+    arm0.write(arm0Pos);
+    arm1.write(arm1Pos);
 
-    delay(1000);  // Adjust delay as needed for smooth movement
+    delay(1000);
   }
 }
 
 void loop() {
-  // Check if a new serial message is available
+  // use IR to detect ball
+  int IRStatus = digitalRead(IRSensor);
+  // Serial.print("IRStatus: ");
+  Serial.println(IRStatus); // 0 or 1
+
+  // check if a serial message is available
   if (Serial.available() > 0) {
     String data = Serial.readStringUntil('\n');
     const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_ARRAY_SIZE(numServos) * 5;
     StaticJsonDocument<capacity> doc;
 
-    // Parse the JSON data
+    // parse the JSON data
     DeserializationError error = deserializeJson(doc, data);
 
     if (!error) {
-      int servoId = doc["servoId"];
+      int servoId = doc["servoId"];   // get the servo id
       
-      // If the command is to play the sequence
+      // if the command is to play the sequence
       if (servoId == 99) {
         JsonArray receivedSequence = doc["sequence"];
 
-        // Play the sequence directly
+        // play the sequence
         playSequence(receivedSequence);
       }
-      // Handle individual servo movements
+      // individual servo movements
       else if (servoId >= 0 && servoId <= 3) {
         int sliderValue = doc["value"];
         if (sliderValue >= 0 && sliderValue <= 180) {
           switch (servoId) {
-            case 0: arm0.write(sliderValue); break;
-            case 3: base.write(sliderValue); break;
+            case 0: base.write(sliderValue); break;
+            case 1: arm0.write(sliderValue); break;
+            case 2: arm1.write(sliderValue); break;
           }
         }
       }
