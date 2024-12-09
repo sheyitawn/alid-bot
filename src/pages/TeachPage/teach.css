@@ -60,3 +60,10 @@
 .teach .teach-buttons button:hover {
     background-color: #1b0666;
 }
+
+.teach-buttons_indicator{
+    border-radius: 50%;
+    /* background-color: rgb(30, 255, 0); */
+    width: 1rem;
+    height: 1rem;
+}
