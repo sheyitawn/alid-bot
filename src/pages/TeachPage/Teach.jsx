@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MdArrowBackIosNew } from "react-icons/md";
 import { Link } from "react-router-dom";
-
+import Modal from '../../components/Modal/Modal';
 import './teach.css'
 
 const Teach = () => {
@@ -24,9 +24,13 @@ const Teach = () => {
   const [sequence, setSequence] = useState([]);
   // var sequence = JSON.parse(localStorage.getItem("sequence"))
 
+  const [openModal, setOpenModal] = useState(null); // Track which modal is open
+
+  const openSpecificModal = () => setOpenModal(true);
+  const closeModal = () => setOpenModal(null);
 
   const addToSequence = () => {
-    const newSequence = [base, arm0, arm1]
+    const newSequence = [base, arm0, arm1, grip]
     console.log("🚀 ~ addToSequence ~ newSequence:", newSequence)
     setSequence((prev) => [...prev, ...[newSequence]]);
     toast.success('adding to sequence');
@@ -88,6 +92,36 @@ const Teach = () => {
     }
   };
 
+  const handleGripChange = async (servoId) => {
+    // const newPos = parseInt(value, 10);
+    setGrip((prevGrip) => (prevGrip === 0 ? 100 : 0));
+
+    // setGrip(newPos);
+    
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: grip }));
+    }  else {
+      toast.error('Unable to send grip position')
+    }
+  };
+
+  const dropBall = async () => {
+    const servoId = 4;
+    const clearance = 20;   // how much before the ball leaves grip
+    const value = grip + clearance;
+
+    const newPos = parseInt(grip, 10);
+    const newClr = parseInt(value, 10);
+    setArm1(newPos);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: newClr })); // swap if opening the wrong way
+      ws.send(JSON.stringify({ servoId, value: newPos }));
+    }  else {
+      toast.error('Unable to drop ball')
+    }
+  };
+
   useEffect(() => {
     const webSocket = new WebSocket("ws://localhost:3003");
     setWs(webSocket);
@@ -116,14 +150,14 @@ const Teach = () => {
   return (
     <div className='teach'>
       <ToastContainer />
-
       <div className="header">
         <Link to="/">
           <div className='back_button'><MdArrowBackIosNew /></div>
         </Link>
-        <p>alid.bot</p>
+        <p onClick={openSpecificModal}>alid.bot</p>
       </div>
-
+      <Modal isOpen={openModal} onClose={closeModal}>
+      </Modal>
       <h1>Teach Mode</h1>
       <div className="teach_sections">
         <div className="teach-arms">
@@ -181,14 +215,40 @@ const Teach = () => {
         <div className="teach-grip">
           <h3>Grip</h3>
 
-          <input
+          {/* <input
             type="range"
             min="500"
             max="2500"
             value={grip}
           />
-          <p>{grip}°</p>
+          <p>{grip}°</p> */}
+
+
+          <label class="teach-switch">
+            <input 
+              type="checkbox" 
+              checked={grip === 0}
+              onChange={(e) => handleGripChange(4)}
+            /> 
+            <span class="teach-slider teach-round"></span>
+          </label>
+
+          <p>{grip === 0 ? <>open</>: <>closed</>}</p>
         </div>
+
+        <div className="teach-ball">
+          <div className="teach-ball_indicator">
+            <h3>Ball</h3> 
+              <div
+                className="teach-ball_indicator-light"
+                style={{background: IRValue === '1' ? 'rgb(30, 255, 0)' : 'rgb(78, 0, 0)'}}>
+                {/* {IRValue} */}
+              </div>
+          </div>
+          <div className='teach-buttons'>
+            <button onClick={dropBall}>drop</button>
+          </div>
+          </div>
         
       </div>
       <div className='teach-buttons'>
@@ -196,15 +256,7 @@ const Teach = () => {
         <button onClick={playSequence}>play sequence</button>
         <button onClick={saveSequence}>save</button>
         <button onClick={resetSequence}>reset</button>
-        <>
-          BALL INDICATOR
 
-          <div
-            className="teach-buttons_indicator"
-            style={{background: IRValue === '1' ? 'rgb(30, 255, 0)' : 'rgb(78, 0, 0)'}}>
-            {/* {IRValue} */}
-          </div>
-        </>
       </div>
 
     </div>
