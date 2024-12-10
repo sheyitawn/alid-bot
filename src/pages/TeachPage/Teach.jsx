@@ -164,6 +164,7 @@ const Teach = () => {
           <div className="teach-arms_a0">
             <h3>Arm 0</h3>
             <input
+              className='teach-round_slider'
               type="range"
               min="0"
               max="180"
@@ -176,6 +177,7 @@ const Teach = () => {
           <div className="teach-arms_a1">
             <h3>Arm 1</h3>
             <input
+              className='teach-round_slider'
               type="range"
               min="0"
               max="180"
@@ -189,6 +191,7 @@ const Teach = () => {
           <div className="teach-arms_a2">
             <h3>Arm 2</h3>
             <input
+              className='teach-round_slider'
               type="range"
               min="0"
               max="180"
@@ -203,6 +206,7 @@ const Teach = () => {
           <h3>Base</h3>
 
           <input
+            className='teach-round_slider'
             type="range"
             min="0"
             max="180"
@@ -230,7 +234,7 @@ const Teach = () => {
               checked={grip === 0}
               onChange={(e) => handleGripChange(4)}
             /> 
-            <span class="teach-slider teach-round"></span>
+            <span class="teach-switch-slider teach-round"></span>
           </label>
 
           <p>{grip === 0 ? <>open</>: <>closed</>}</p>
