@@ -4,10 +4,18 @@ import { Dot } from 'react-animated-dots';
 import { MdArrowBackIosNew } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
+import Modal from '../../components/Modal/Modal';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 const Play = () => {
   const [ws, setWs] = useState(null);
+
+  const [openModal, setOpenModal] = useState(null); // Track which modal is open
+
+  const openSpecificModal = () => setOpenModal(true);
+  const closeModal = () => setOpenModal(null);
+
   var sequence = JSON.parse(localStorage.getItem("sequence"))
   console.log("🚀 ~ Play ~ sequence:", sequence)
 
@@ -52,7 +60,7 @@ const Play = () => {
           <Link to="/">
             <div className='back_button'><MdArrowBackIosNew /></div>
           </Link>
-          <p>alid.bot</p>
+          <p onClick={openSpecificModal}>alid.bot</p>
         </div>
       <div className='play_player'>
         <h2>in progress</h2>
@@ -60,6 +68,8 @@ const Play = () => {
           <Dot className='dot'>.</Dot>
           <Dot className='dot'>.</Dot>
       </div>
+      <Modal isOpen={openModal} onClose={closeModal}>
+      </Modal>
       <button onClick={playSequence}>PLAY ME</button>
     </div>
 
