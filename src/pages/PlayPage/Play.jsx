@@ -11,6 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const Play = () => {
   const [ws, setWs] = useState(null);
 
+  const [IRValue, setIRValue] = useState(null);
+
   const [openModal, setOpenModal] = useState(null); // Track which modal is open
 
   const openSpecificModal = () => setOpenModal(true);
@@ -31,28 +33,30 @@ const Play = () => {
   }
 
   useEffect(() => {
-    const webSocket = new WebSocket("ws://localhost:8080");
+    const webSocket = new WebSocket("ws://localhost:3003");
     setWs(webSocket);
+
+    webSocket.onmessage = (event) => {
+      setIRValue(event.data);
+
+    };
 
     return () => {
       if (webSocket) {
         webSocket.close();
       }
     };
-
-    // return () => {
-    //   if (webSocket.readyState === 1) { // <-- This is important
-    //     webSocket.close();
-    //   }
-  // }
   }, []);
 
   useEffect(() => {
+    if (IRValue == 1) {   // if ball is detected
+      playSequence()
 
-    playSequence()
+    }
+
    
     // setInterval(()=>playSequence(), 1000); // add a delay
- },[sequence]);
+ },[IRValue]);
 
   return (
     <div className="play">
@@ -61,7 +65,7 @@ const Play = () => {
             <div className='back_button'><MdArrowBackIosNew /></div>
           </Link>
           <p onClick={openSpecificModal}>alid.bot</p>
-        </div>
+      </div>
       <div className='play_player'>
         <h2>in progress</h2>
           <Dot className='dot'>.</Dot>
@@ -70,7 +74,15 @@ const Play = () => {
       </div>
       <Modal isOpen={openModal} onClose={closeModal}>
       </Modal>
-      <button onClick={playSequence}>PLAY ME</button>
+
+      <div className="play_indicator">
+        BALL
+        <div
+          className="play_indicator-light"
+          style={{background: IRValue === '1' ? 'rgb(30, 255, 0)' : 'rgb(78, 0, 0)'}}>
+        </div>
+
+      </div>
     </div>
 
   )

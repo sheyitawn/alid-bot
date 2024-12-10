@@ -9,3 +9,19 @@
 .play_player .dot {
     font-size: 2em;
 }
+
+.play_indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: right;
+    margin: 0 1rem;
+
+}
+
+.play_indicator-light {
+    border-radius: 50%;
+    /* background-color: rgb(30, 255, 0); */
+    width: 1rem;
+    height: 1rem;
+}
