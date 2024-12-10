@@ -117,13 +117,13 @@
     width: 26px;
     left: 4px;
     bottom: 4px;
-    background-color: #fff;
+    background-color: #3700ff;
     -webkit-transition: .4s;
     transition: .4s;
 }
 
 input:checked + .teach-switch-slider {
-        background-color: #3700ff;
+        background-color: rgb(16, 19, 36);
 }
 
 input:focus + .teach-switch-slider {
@@ -136,7 +136,6 @@ input:checked + .teach-switch-slider:before {
     transform: translateX(26px);
 }
 
-/* Rounded sliders */
 .teach-switch-slider.teach-round {
     border-radius: 34px;
 }
