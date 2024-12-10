@@ -26,6 +26,7 @@ const Modal = ({ isOpen, onClose }) => {
                 <li>move the bot up to avoid obstruction (arm _ ) & add to sequence</li>
                 <li>select 'play sequence' to test</li>
                 <li>if sequence works, save sequence</li>
+                <li>save sequence</li>
                 <li>go to the home page</li>
                 <li>select 'PLAY'</li>
 
