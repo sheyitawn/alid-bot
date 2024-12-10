@@ -113,7 +113,7 @@ const Teach = () => {
 
     const newPos = parseInt(grip, 10);
     const newClr = parseInt(value, 10);
-    setArm1(newPos);
+    setGrip(newPos);
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ servoId, value: newClr })); // swap if opening the wrong way
       ws.send(JSON.stringify({ servoId, value: newPos }));
@@ -218,16 +218,6 @@ const Teach = () => {
         </div>
         <div className="teach-grip">
           <h3>Grip</h3>
-
-          {/* <input
-            type="range"
-            min="500"
-            max="2500"
-            value={grip}
-          />
-          <p>{grip}°</p> */}
-
-
           <label class="teach-switch">
             <input 
               type="checkbox" 
