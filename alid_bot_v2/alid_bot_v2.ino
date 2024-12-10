@@ -1,7 +1,7 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 
-Servo arm0, arm1, base;
+Servo arm0, arm1, base, grip;
 
 const int greenLED = 6;
 const int redLED = 5;
@@ -14,6 +14,7 @@ void setup() {
   base.attach(A0); // change to A5 for bot
   arm0.attach(A1); // change to A3 for bot
   arm1.attach(A2);
+  grip.attach(A4);
 
   
   pinMode(greenLED, OUTPUT);
@@ -25,6 +26,7 @@ void setup() {
   base.write(0);
   arm0.write(0);
   arm1.write(0);
+  grip.write(0);
   Serial.begin(9600);
   Serial.println("ALID-BOT READY!💫");
 
@@ -42,16 +44,18 @@ void playSequence(JsonArray sequence) {
 
   for (JsonArray step : sequence) {
     // final -> [base, arm0, arm1, arm2, arm3, grip]
-    // [base, arm0, arm1]
+    // [base, arm0, arm1, grip]
     int basePos = step[0];
     int arm0Pos = step[1];
     int arm1Pos = step[2];
+    int gripPos = step[3];  // change to 4
 
 
     // move servos to their respective positions
     base.write(basePos);
     arm0.write(arm0Pos);
     arm1.write(arm1Pos);
+    grip.write(gripPos);
 
     delay(1000);
   }
@@ -66,7 +70,7 @@ void loop() {
   // check if a serial message is available
   if (Serial.available() > 0) {
     String data = Serial.readStringUntil('\n');
-    const size_t capacity = JSON_OBJECT_SIZE(2) + JSON_ARRAY_SIZE(numServos) * 5;
+    const size_t capacity = JSON_OBJECT_SIZE(10) + JSON_ARRAY_SIZE(numServos) * 200;
     StaticJsonDocument<capacity> doc;
 
     // parse the JSON data
@@ -83,13 +87,14 @@ void loop() {
         playSequence(receivedSequence);
       }
       // individual servo movements
-      else if (servoId >= 0 && servoId <= 3) {
+      else if (servoId >= 0 && servoId <= 5) {
         int sliderValue = doc["value"];
         if (sliderValue >= 0 && sliderValue <= 180) {
           switch (servoId) {
             case 0: base.write(sliderValue); break;
             case 1: arm0.write(sliderValue); break;
             case 2: arm1.write(sliderValue); break;
+            case 4: grip.write(sliderValue); break;
           }
         }
       }
@@ -108,3 +113,8 @@ void loop() {
 // Example JSON to send from React:
 // {"servoId": 99, "sequence": [[90, 45], [45, 90], [135, 135]]}
 // {"servoId":0,"value":54}
+
+
+
+// use this to test
+// {"servoId":99,"sequence":[[120,169,144,0],[22,44,103,0],[179,165,0,0]]}
