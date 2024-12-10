@@ -7,11 +7,12 @@
 
 
 
-.teach h1{
+.teach h1 {
     text-align: center;
+    margin: 1rem 0;
 }
 
-.teach p{
+.teach p {
     margin: 0;
 
 }
@@ -37,8 +38,9 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    background-color: rgb(17, 11, 49);
+    background-color: rgb(14, 12, 26);
     border-radius: .5rem;
+    padding: .2rem 0;
     margin: 2rem 3rem;
 }
 

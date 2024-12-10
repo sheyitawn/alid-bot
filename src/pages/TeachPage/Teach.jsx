@@ -237,7 +237,7 @@ const Teach = () => {
             <span class="teach-switch-slider teach-round"></span>
           </label>
 
-          <p>{grip === 0 ? <>open</>: <>closed</>}</p>
+          <p>{grip === 0 ? <>closed</>: <>open</>}</p>
         </div>
 
         <div className="teach-ball">

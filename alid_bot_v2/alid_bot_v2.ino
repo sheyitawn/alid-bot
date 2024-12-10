@@ -1,5 +1,9 @@
+// #define SERIAL_BUFFER_SIZE 256
+
 #include <Servo.h>
 #include <ArduinoJson.h>
+
+
 
 Servo arm0, arm1, base, grip;
 
@@ -8,7 +12,10 @@ const int redLED = 5;
 
 int IRSensor = A5;
 
-const int numServos = 3;           // Number of servos
+// const int numServos = 3;           // Number of servos
+
+String incomingData = "";
+bool receiving = false;
 
 void setup() {
   base.attach(A0); // change to A5 for bot
@@ -37,9 +44,9 @@ void playSequence(JsonArray sequence) {
 
   for (int i = 0; i < 3; i++) {
     digitalWrite(greenLED, HIGH);
-    delay(100);
+    // delay(100);
     digitalWrite(greenLED, LOW);
-    delay(100);
+    // delay(100);
   }
 
   for (JsonArray step : sequence) {
@@ -57,7 +64,7 @@ void playSequence(JsonArray sequence) {
     arm1.write(arm1Pos);
     grip.write(gripPos);
 
-    delay(1000);
+    // delay(1000);
   }
 }
 
@@ -68,46 +75,72 @@ void loop() {
   Serial.println(IRStatus); // 0 or 1
 
   // check if a serial message is available
-  if (Serial.available() > 0) {
-    String data = Serial.readStringUntil('\n');
-    const size_t capacity = JSON_OBJECT_SIZE(10) + JSON_ARRAY_SIZE(numServos) * 200;
-    StaticJsonDocument<capacity> doc;
+  while (Serial.available() > 0) {
+    // String data = Serial.readStringUntil('\n');
+    char c = Serial.read();
 
-    // parse the JSON data
-    DeserializationError error = deserializeJson(doc, data);
+    if (c == '{') {   // if JSON starts with '{'
+      receiving = true;
+      incomingData = ""; // reset
+    }
 
-    if (!error) {
-      int servoId = doc["servoId"];   // get the servo id
-      
-      // if the command is to play the sequence
-      if (servoId == 99) {
-        JsonArray receivedSequence = doc["sequence"];
+    if (receiving) {
+      incomingData += c;
 
-        // play the sequence
-        playSequence(receivedSequence);
-      }
-      // individual servo movements
-      else if (servoId >= 0 && servoId <= 5) {
-        int sliderValue = doc["value"];
-        if (sliderValue >= 0 && sliderValue <= 180) {
-          switch (servoId) {
-            case 0: base.write(sliderValue); break;
-            case 1: arm0.write(sliderValue); break;
-            case 2: arm1.write(sliderValue); break;
-            case 4: grip.write(sliderValue); break;
+      Serial.print("incomingData: ");
+        Serial.println(incomingData);
+
+      // stop when JSON is complete
+      if (c == '}') {
+        receiving = false;  // stop receiving
+
+        const size_t capacity = JSON_OBJECT_SIZE(10) + JSON_ARRAY_SIZE(10) * 100;
+        StaticJsonDocument<capacity> doc;
+        DeserializationError error = deserializeJson(doc, incomingData);
+
+        
+
+        Serial.print("incomingData-length: ");
+        Serial.println(incomingData.length());
+
+        
+        Serial.print("capacity: ");
+        Serial.println(capacity);
+
+        if (!error) {
+          int servoId = doc["servoId"];   // get the servo id
+          
+          // if the command is to play the sequence
+          if (servoId == 99) {
+            JsonArray receivedSequence = doc["sequence"];
+
+            // play the sequence
+            playSequence(receivedSequence);
           }
+          // individual servo movements
+          else if (servoId >= 0 && servoId <= 5) {
+            int sliderValue = doc["value"];
+            if (sliderValue >= 0 && sliderValue <= 180) {
+              switch (servoId) {
+                case 0: base.write(sliderValue); break;
+                case 1: arm0.write(sliderValue); break;
+                case 2: arm1.write(sliderValue); break;
+                case 4: grip.write(sliderValue); break;
+              }
+            }
+          }
+        } else {
+          Serial.println("JSON parsing failed");
         }
       }
-    } else {
-      Serial.println("JSON parsing failed");
     }
-  }
 
-  // idle state 
-  digitalWrite(redLED, HIGH);
-  delay(500);
-  digitalWrite(redLED, LOW);
-  delay(500);
+    // idle state 
+    digitalWrite(redLED, HIGH);
+    // delay(500);
+    digitalWrite(redLED, LOW);
+    // delay(500);
+  }
 }
 
 // Example JSON to send from React:
@@ -118,3 +151,4 @@ void loop() {
 
 // use this to test
 // {"servoId":99,"sequence":[[120,169,144,0],[22,44,103,0],[179,165,0,0]]}
+// {"servoId":99,"sequence":[[120,169,144,0],[22,44,103,0],[179,165,0,0],[22,44,103,0]]}
