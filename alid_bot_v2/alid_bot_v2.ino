@@ -67,6 +67,7 @@ void playSequence(JsonArray sequence) {
     moveServo(base, base.read(), basePos);
     moveServo(arm0, arm0.read(), arm0Pos);
     moveServo(arm1, arm1.read(), arm1Pos);
+    moveServo(arm2, arm2.read(), arm2Pos);
     moveServo(grip, grip.read(), gripPos);
 
     delay(1000);
