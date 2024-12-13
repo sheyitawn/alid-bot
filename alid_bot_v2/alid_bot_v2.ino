@@ -39,19 +39,22 @@ void moveServo(Servo &servo, int currentPosition, int targetPosition) {
     int step = (currentPosition < targetPosition) ? 1 : -1;
     for (int pos = currentPosition; pos != targetPosition; pos += step) {
       servo.write(pos);
+      digitalWrite(greenLED, HIGH);
       delay(50);
+    digitalWrite(greenLED, LOW);
+
     }
     servo.write(targetPosition);
 }
 
 void playSequence(JsonArray sequence) {
 
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(greenLED, HIGH);
-    delay(100);
-    digitalWrite(greenLED, LOW);
-    delay(100);
-  }
+  // for (int i = 0; i < 3; i++) {
+  //   digitalWrite(greenLED, HIGH);
+  //   delay(100);
+  //   digitalWrite(greenLED, LOW);
+  //   delay(100);
+  // }
 
   for (JsonArray step : sequence) {
     // final -> [base, arm0, arm1, arm2, grip]
@@ -144,6 +147,7 @@ void loop() {
 
 // {"servoId": 99, "sequence": [[90, 45], [45, 90], [135, 135]]}
 // {"servoId":0,"value":54}
+// {"servoId":0,"value":135}
 
 
 
