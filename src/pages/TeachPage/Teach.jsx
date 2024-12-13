@@ -10,13 +10,16 @@ import './teach.css'
 const Teach = () => {
   const [ws, setWs] = useState(null);
 
-  const [arm0, setArm0] = useState(0);
-  const [arm1, setArm1] = useState(0);
-  const [arm2, setArm2] = useState(0);
+  const [arm0, setArm0] = useState(80);
+  const [arm1, setArm1] = useState(80);
+  const [arm2, setArm2] = useState(80);
 
-  const [base, setBase] = useState(0);
+  const [base, setBase] = useState(135);
 
   const [grip, setGrip] = useState(0);
+
+
+  const [drop, setDrop] = useState(0);  // 0 false, 1 true
 
   const [IRValue, setIRValue] = useState(null);
 
@@ -30,9 +33,11 @@ const Teach = () => {
   const closeModal = () => setOpenModal(null);
 
   const addToSequence = () => {
-    const newSequence = [base, arm0, arm1, grip]
+    const newSequence = [base, arm0, arm1, arm2, grip]
+    // const newSequence = [base, arm0, arm1, grip, drop]
     console.log("🚀 ~ addToSequence ~ newSequence:", newSequence)
     setSequence((prev) => [...prev, ...[newSequence]]);
+    // setDrop(0)
     toast.success('adding to sequence');
   }
 
@@ -92,6 +97,17 @@ const Teach = () => {
     }
   };
 
+  const handleArm2Change = async (value, servoId) => {
+    const newPos = parseInt(value, 10);
+    setArm2(newPos);
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ servoId, value: newPos }));
+    }  else {
+      toast.error('Unable to send arm 2 position')
+    }
+  };
+
   const handleGripChange = async (servoId) => {
     // const newPos = parseInt(value, 10);
     setGrip((prevGrip) => (prevGrip === 0 ? 100 : 0));
@@ -113,10 +129,11 @@ const Teach = () => {
 
     const newPos = parseInt(grip, 10);
     const newClr = parseInt(value, 10);
-    setGrip(newPos);
+    // setDrop(1);
+
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ servoId, value: newClr })); // swap if opening the wrong way
-      ws.send(JSON.stringify({ servoId, value: newPos }));
+      ws.send(JSON.stringify({ servoId, value: newPos })); // swap if opening the wrong way
+      ws.send(JSON.stringify({ servoId, value: newClr }));
     }  else {
       toast.error('Unable to drop ball')
     }
@@ -163,6 +180,7 @@ const Teach = () => {
         <div className="teach-arms">
           <div className="teach-arms_a0">
             <h3>Arm 0</h3>
+            
             <input
               className='teach-round_slider'
               type="range"
@@ -196,7 +214,7 @@ const Teach = () => {
               min="0"
               max="180"
               value={arm2}
-              onChange={(e) => setArm2(parseInt(e.target.value))}
+              onChange={(e) => handleArm2Change(e.target.value, 3)}
             />
             <p>{arm2}°</p>
           </div>

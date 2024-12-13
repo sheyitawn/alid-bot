@@ -2,7 +2,7 @@ import serial
 import time
 
 # open serial connection
-ssc32 = serial.Serial('COM5', 115200, timeout=1)
+ssc32 = serial.Serial('COM11', 115200, timeout=1)
 print("calibrating alid-bot...")
 
 ssc32.write(b'#0P1700T1000\r')

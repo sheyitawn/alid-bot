@@ -1,9 +1,9 @@
 #include <Servo.h>
 #include <ArduinoJson.h>
 
-Servo arm0, arm1, base, grip;
+Servo arm0, arm1, arm2, base, grip;
 
-const int greenLED = 6;
+const int greenLED = 4;
 const int redLED = 5;
 
 int IRSensor = A5;
@@ -11,9 +11,10 @@ int IRSensor = A5;
 const int numServos = 3;           // Number of servos
 
 void setup() {
-  base.attach(A0); // change to A5 for bot
-  arm0.attach(A1); // change to A3 for bot
+  base.attach(A0); 
+  arm0.attach(A1);
   arm1.attach(A2);
+  arm2.attach(A3);
   grip.attach(A4);
 
   
@@ -23,14 +24,24 @@ void setup() {
   pinMode(IRSensor, INPUT); // IR Sensor pin INPUT
   // pinMode(LED_BUILTIN, OUTPUT);
 
-  base.write(0);
-  arm0.write(0);
-  arm1.write(0);
+  base.write(135);
+  arm0.write(80);
+  arm1.write(80);
+  arm2.write(80);
   grip.write(0);
   Serial.begin(9600);
   Serial.println("ALID-BOT READY!💫");
 
 
+}
+
+void moveServo(Servo &servo, int currentPosition, int targetPosition) {
+    int step = (currentPosition < targetPosition) ? 1 : -1;
+    for (int pos = currentPosition; pos != targetPosition; pos += step) {
+      servo.write(pos);
+      delay(50);
+    }
+    servo.write(targetPosition);
 }
 
 void playSequence(JsonArray sequence) {
@@ -43,29 +54,32 @@ void playSequence(JsonArray sequence) {
   }
 
   for (JsonArray step : sequence) {
-    // final -> [base, arm0, arm1, arm2, arm3, grip]
+    // final -> [base, arm0, arm1, arm2, grip]
     // [base, arm0, arm1, grip]
     int basePos = step[0];
     int arm0Pos = step[1];
     int arm1Pos = step[2];
-    int gripPos = step[3];  // change to 4
+    int arm2Pos = step[3];
+    int gripPos = step[4];  // change to 4
 
 
     // move servos to their respective positions
-    base.write(basePos);
-    arm0.write(arm0Pos);
-    arm1.write(arm1Pos);
-    grip.write(gripPos);
+    moveServo(base, base.read(), basePos);
+    moveServo(arm0, arm0.read(), arm0Pos);
+    moveServo(arm1, arm1.read(), arm1Pos);
+    moveServo(grip, grip.read(), gripPos);
 
     delay(1000);
   }
 }
 
+
+
 void loop() {
   // use IR to detect ball
   int IRStatus = digitalRead(IRSensor);
   // Serial.print("IRStatus: ");
-  Serial.println(IRStatus); // 0 or 1
+  Serial.println(!IRStatus); // 0 or 1
 
   // check if a serial message is available
   if (Serial.available() > 0) {
@@ -90,11 +104,28 @@ void loop() {
       else if (servoId >= 0 && servoId <= 5) {
         int sliderValue = doc["value"];
         if (sliderValue >= 0 && sliderValue <= 180) {
+          int currentPosition;
           switch (servoId) {
-            case 0: base.write(sliderValue); break;
-            case 1: arm0.write(sliderValue); break;
-            case 2: arm1.write(sliderValue); break;
-            case 4: grip.write(sliderValue); break;
+            case 0: 
+                currentPosition = base.read(); // Read current position
+                moveServo(base, currentPosition, sliderValue);
+                break;
+            case 1: 
+                currentPosition = arm0.read();
+                moveServo(arm0, currentPosition, sliderValue);
+                break;
+            case 2: 
+                currentPosition = arm1.read();
+                moveServo(arm1, currentPosition, sliderValue);
+                break;
+            case 3: 
+              currentPosition = arm2.read();
+              moveServo(arm2, currentPosition, sliderValue);
+              break;
+            case 4: 
+              currentPosition = grip.read();
+              moveServo(grip, currentPosition, sliderValue);
+              break;
           }
         }
       }
