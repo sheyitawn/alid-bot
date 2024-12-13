@@ -141,7 +141,6 @@ void loop() {
   delay(500);
 }
 
-// Example JSON to send from React:
 // {"servoId": 99, "sequence": [[90, 45], [45, 90], [135, 135]]}
 // {"servoId":0,"value":54}
 

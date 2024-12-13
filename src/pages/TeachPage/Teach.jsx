@@ -108,17 +108,14 @@ const Teach = () => {
     }
   };
 
-  const handleGripChange = async (servoId) => {
-    // const newPos = parseInt(value, 10);
-    setGrip((prevGrip) => (prevGrip === 0 ? 100 : 0));
-
-    // setGrip(newPos);
-    
-
+  const handleGripChange = async (servoId, newValue) => {
+    const gripValue = newValue ? 0 : 100; 
+    setGrip(gripValue);
+  
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ servoId, value: grip }));
-    }  else {
-      toast.error('Unable to send grip position')
+      ws.send(JSON.stringify({ servoId, value: gripValue }));
+    } else {
+      toast.error('Unable to send grip position');
     }
   };
 
@@ -180,6 +177,7 @@ const Teach = () => {
         <div className="teach-arms">
           <div className="teach-arms_a0">
             <h3>Arm 0</h3>
+            forwards --- backwards
             
             <input
               className='teach-round_slider'
@@ -194,6 +192,8 @@ const Teach = () => {
 
           <div className="teach-arms_a1">
             <h3>Arm 1</h3>
+            upwards --- downwards
+
             <input
               className='teach-round_slider'
               type="range"
@@ -208,6 +208,8 @@ const Teach = () => {
 
           <div className="teach-arms_a2">
             <h3>Arm 2</h3>
+            wrist down --- wrist up
+
             <input
               className='teach-round_slider'
               type="range"
@@ -222,7 +224,7 @@ const Teach = () => {
         </div>
         <div className="teach-base">
           <h3>Base</h3>
-
+          ccw --- cw
           <input
             className='teach-round_slider'
             type="range"
@@ -240,12 +242,12 @@ const Teach = () => {
             <input 
               type="checkbox" 
               checked={grip === 0}
-              onChange={(e) => handleGripChange(4)}
+              onChange={(e) => handleGripChange(4, e.target.checked)} 
             /> 
             <span class="teach-switch-slider teach-round"></span>
           </label>
 
-          <p>{grip === 0 ? <>closed</>: <>open</>}</p>
+          <p>{grip === 0 ? <>open</>: <>closed</>}</p>
         </div>
 
         <div className="teach-ball">
