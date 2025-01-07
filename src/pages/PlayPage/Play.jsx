@@ -19,12 +19,12 @@ const Play = () => {
   const closeModal = () => setOpenModal(null);
 
   var sequence = JSON.parse(localStorage.getItem("sequence"))
+  
   console.log("🚀 ~ Play ~ sequence:", sequence)
 
   const playSequence = () => {
     console.log("🚀 ~ sequence:", sequence)
     console.log("🚀 ~ playSequence ~ ws:", ws)
-    // console.log("🚀 ~ playSequence ~ ws.readyState:", ws.readyState)
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ servoId: 99, sequence })); // command to play the sequence
@@ -33,12 +33,11 @@ const Play = () => {
   }
 
   useEffect(() => {
-    const webSocket = new WebSocket("ws://localhost:3003");
+    const webSocket = new WebSocket("ws://localhost:3003"); // connect to websocket
     setWs(webSocket);
 
     webSocket.onmessage = (event) => {
       setIRValue(event.data);
-
     };
 
     return () => {
@@ -50,12 +49,10 @@ const Play = () => {
 
   useEffect(() => {
     if (IRValue == 1) {   // if ball is detected
-      playSequence()
+      playSequence()  // play the sequence
 
     }
 
-   
-    // setInterval(()=>playSequence(), 1000); // add a delay
  },[IRValue]);
 
   return (

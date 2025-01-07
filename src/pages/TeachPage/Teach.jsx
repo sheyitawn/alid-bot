@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import newRequest from '../../utils/newRequest';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { MdArrowBackIosNew } from "react-icons/md";
@@ -8,7 +7,7 @@ import Modal from '../../components/Modal/Modal';
 import './teach.css'
 
 const Teach = () => {
-  const [ws, setWs] = useState(null);
+  const [ws, setWs] = useState(null); // set websocket to null
 
   const [arm0, setArm0] = useState(80);
   const [arm1, setArm1] = useState(80);
@@ -25,39 +24,36 @@ const Teach = () => {
 
 
   const [sequence, setSequence] = useState([]);
-  // var sequence = JSON.parse(localStorage.getItem("sequence"))
 
-  const [openModal, setOpenModal] = useState(null); // Track which modal is open
+  const [openModal, setOpenModal] = useState(null); // track the current open modal
 
-  const openSpecificModal = () => setOpenModal(true);
-  const closeModal = () => setOpenModal(null);
+  const openSpecificModal = () => setOpenModal(true); // function to open modal
+  const closeModal = () => setOpenModal(null); // function to close modal
 
   const addToSequence = () => {
     const newSequence = [base, arm0, arm1, arm2, grip]
-    // const newSequence = [base, arm0, arm1, grip, drop]
     console.log("🚀 ~ addToSequence ~ newSequence:", newSequence)
-    setSequence((prev) => [...prev, ...[newSequence]]);
-    // setDrop(0)
-    toast.success('adding to sequence');
+    setSequence((prev) => [...prev, ...[newSequence]]); // add to sequence
+    toast.success('adding to sequence');   // send confirmaton message
   }
 
   const playSequence = () => {
     console.log("🚀 ~ sequence:", sequence)
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ws && ws.readyState === WebSocket.OPEN) { // check that websocket is open
       ws.send(JSON.stringify({ servoId: 99, sequence })); // command to play the sequence
-      toast.success(`playing sequence`);
+      toast.success(`playing sequence`); // send confirmation message
     }
   }
 
   const saveSequence = () => {
-    localStorage.setItem("sequence", JSON.stringify(sequence));
-    toast.success(`saving...`);
+    localStorage.setItem("sequence", JSON.stringify(sequence)); // save to local storage
+    toast.success(`saving...`); // send confirmation message
   }
 
   const resetSequence = () => {
-    setSequence([])
+    setSequence([]) // empty sequence
     console.log("🚀 ~ sequence:", sequence)
-    toast.success(`resetting...`);
+    toast.success(`resetting...`); // send confirmation message
   }
 
   const handleBaseChange = async (value, servoId) => {
@@ -120,13 +116,12 @@ const Teach = () => {
   };
 
   const dropBall = async () => {
-    const servoId = 4;
+    const servoId = 4; // servoid of the grip
     const clearance = 20;   // how much before the ball leaves grip
     const value = grip + clearance;
 
     const newPos = parseInt(grip, 10);
     const newClr = parseInt(value, 10);
-    // setDrop(1);
 
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ servoId, value: newPos })); // swap if opening the wrong way
@@ -142,7 +137,6 @@ const Teach = () => {
 
     webSocket.onmessage = (event) => {
       setIRValue(event.data);
-
     };
 
     return () => {
@@ -150,13 +144,6 @@ const Teach = () => {
         webSocket.close();
       }
     };
-
-
-    // return () => {
-    //   if (webSocket.readyState === 1) { // <-- This is important
-    //     webSocket.close();
-    //   }
-    // }
   }, []);
 
   
@@ -256,7 +243,6 @@ const Teach = () => {
               <div
                 className="teach-ball_indicator-light"
                 style={{background: IRValue === '1' ? 'rgb(30, 255, 0)' : 'rgb(78, 0, 0)'}}>
-                {/* {IRValue} */}
               </div>
           </div>
           <div className='teach-buttons'>
@@ -265,12 +251,12 @@ const Teach = () => {
           </div>
         
       </div>
+      
       <div className='teach-buttons'>
         <button onClick={addToSequence}>add to sequence</button>
         <button onClick={playSequence}>play sequence</button>
         <button onClick={saveSequence}>save</button>
         <button onClick={resetSequence}>reset</button>
-
       </div>
 
     </div>

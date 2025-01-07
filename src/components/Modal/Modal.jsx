@@ -5,7 +5,7 @@ const Modal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleContentClick = (e) => {
-    e.stopPropagation(); // Prevent the click event from propagating to the overlay
+    e.stopPropagation(); // prevent the click event from propagating to the overlay
   };
 
   return (

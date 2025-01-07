@@ -21,3 +21,8 @@ packages\arduino\hardware\avr\1.8.6\cores\arduino
 in HardwareSerial.h
 
 You have to do this to run longer commands.
+
+
+### note 2
+if you get a 'Error: Opening COMx: File not found' error,
+change the com in server.js
